@@ -1,4 +1,4 @@
-// script.js - modular Firebase with email/pass fallback, spinner, reminders, light/dark mode
+// script.js - Firebase integration for subscription management
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 import {
@@ -64,8 +64,7 @@ function showLoading(show) {
 
 // Helper: update totals
 function updateTotals() {
-  let month = 0,
-    year = 0;
+  let month = 0, year = 0;
   subscriptions.forEach((sub) => {
     if (sub.cancelled) return; // skip cancelled subs
     const price = parseFloat(sub.price);
@@ -77,49 +76,31 @@ function updateTotals() {
       month += price / 12;
     }
   });
-
   monthlyTotal.textContent = month.toFixed(2);
   yearlyTotal.textContent = year.toFixed(2);
 }
 
 // Helper: render subscriptions list
 function renderList() {
-  subList.innerHTML = "";
-  if (subscriptions.length === 0) {
-    subList.innerHTML = "<li>No subscriptions yet.</li>";
-    updateTotals();
-    return;
-  }
+  subList.innerHTML = subscriptions.length === 0 ? "<li>No subscriptions yet.</li>" : "";
   subscriptions.forEach((sub, index) => {
     const li = document.createElement("li");
     li.className = sub.cancelled ? "sub-cancelled" : "";
     li.innerHTML = `
       <div>
         <strong>${sub.name}</strong> — $${sub.price} / ${sub.frequency}<br />
-        Next Billing: ${sub.nextDate} ${isReminderDue(sub.nextDate) ? "⚠️" : ""}
+        Next Billing: ${sub.nextDate}
       </div>
       <div>
-        <button data-index="${index}" class="cancel-btn">
-          ${sub.cancelled ? "Undo Cancel" : "Cancel"}
-        </button>
+        <button data-index="${index}" class="cancel-btn">${sub.cancelled ? "Undo Cancel" : "Cancel"}</button>
         <button data-index="${index}" class="remove-btn">Remove</button>
       </div>
     `;
-    const cancelBtn = li.querySelector(".cancel-btn");
-    cancelBtn.addEventListener("click", () => toggleCancel(index));
-    const removeBtn = li.querySelector(".remove-btn");
-    removeBtn.addEventListener("click", () => deleteSub(index));
+    li.querySelector(".cancel-btn").addEventListener("click", () => toggleCancel(index));
+    li.querySelector(".remove-btn").addEventListener("click", () => deleteSub(index));
     subList.appendChild(li);
   });
   updateTotals();
-}
-
-// Check if next billing date is within 3 days (reminder)
-function isReminderDue(nextDateStr) {
-  const nextDate = new Date(nextDateStr);
-  const now = new Date();
-  const diff = (nextDate - now) / (1000 * 60 * 60 * 24); // days diff
-  return diff >= 0 && diff <= 3;
 }
 
 // Firestore CRUD
@@ -141,11 +122,7 @@ async function loadSubs() {
   try {
     const docRef = doc(db, "subscriptions", userId);
     const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      subscriptions = docSnap.data().subs || [];
-    } else {
-      subscriptions = [];
-    }
+    subscriptions = docSnap.exists() ? docSnap.data().subs || [] : [];
   } catch (e) {
     alert("Error loading subscriptions: " + e.message);
     subscriptions = [];
@@ -213,12 +190,6 @@ modalCloseBtn.addEventListener("click", () => {
   emailLoginModal.style.display = "none";
 });
 
-window.addEventListener("click", (e) => {
-  if (e.target === emailLoginModal) {
-    emailLoginModal.style.display = "none";
-  }
-});
-
 // Email login/register form
 emailLoginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -232,12 +203,10 @@ emailLoginForm.addEventListener("submit", async (e) => {
   }
   showLoading(true);
   try {
-    // Try sign in first
     await signInWithEmailAndPassword(auth, email, password);
     emailLoginModal.style.display = "none";
   } catch (signInError) {
     if (signInError.code === "auth/user-not-found") {
-      // Register new user if not found
       try {
         await createUserWithEmailAndPassword(auth, email, password);
         emailLoginModal.style.display = "none";
@@ -288,15 +257,7 @@ onAuthStateChanged(auth, async (user) => {
 // Theme toggle logic
 const THEME_KEY = "subspace-theme";
 function setTheme(theme) {
-  if (theme === "dark") {
-    body.classList.add("dark");
-    body.classList.remove("light");
-    toggleThemeBtn.textContent = "☀️";
-  } else {
-    body.classList.add("light");
-    body.classList.remove("dark");
-    toggleThemeBtn.textContent = "🌙";
-  }
+  body.className = theme;
   localStorage.setItem(THEME_KEY, theme);
 }
 
