@@ -8,66 +8,54 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="light">
-  <div class="auth-container">
-    <div class="auth-buttons">
-      <button id="loginGoogleBtn">Login with Google</button>
-      <button id="loginEmailBtn">Login with Email</button>
-      <button id="logoutBtn" style="display:none;">Logout</button>
-    </div>
-    <p id="userEmail"></p>
-  </div>
-
-  <div class="theme-toggle-container">
-    <button id="toggleThemeBtn" title="Toggle Light/Dark Mode">🌙</button>
-  </div>
-
-  <div class="app-container" style="display:none;">
+  <div class="container">
     <h1>SubSpace</h1>
-
-    <form id="subForm">
-      <label for="name">Subscription Name:</label>
-      <input type="text" id="name" placeholder="e.g. Netflix" required />
-
-      <label for="price">Price ($):</label>
-      <input type="number" id="price" placeholder="e.g. 14.99" step="0.01" required />
-
-      <label for="nextDate">Next Billing Date (when this subscription will charge you next):</label>
-      <input type="date" id="nextDate" required />
-
-      <label for="frequency">Billing Frequency:</label>
-      <select id="frequency" required>
-        <option value="monthly">Monthly</option>
-        <option value="yearly">Yearly</option>
-      </select>
-
-      <button type="submit">Add Subscription</button>
-    </form>
-
-    <h2>Your Subscriptions</h2>
-    <ul id="subList"></ul>
-
-    <div class="summary">
-      <p>Total Monthly: $<span id="monthlyTotal">0</span></p>
-      <p>Total Yearly: $<span id="yearlyTotal">0</span></p>
+    <div class="auth-container">
+      <button id="loginGoogleBtn">Login/Signup with Google</button>
+      <button id="loginEmailBtn">Login/Signup with Email</button>
+      <button id="logoutBtn" style="display:none;">Logout</button>
+      <p id="userEmail"></p>
     </div>
-  </div>
 
-  <!-- Modal for email login -->
-  <div id="emailLoginModal" class="modal" style="display:none;">
-    <div class="modal-content">
-      <span id="modalCloseBtn" class="close">&times;</span>
-      <h3>Email Login / Register</h3>
-      <form id="emailLoginForm">
-        <input type="email" id="emailInput" placeholder="Email" required />
-        <input type="password" id="passwordInput" placeholder="Password" required minlength="6" />
-        <button type="submit">Login / Register</button>
+    <div class="theme-toggle-container">
+      <button id="toggleThemeBtn" title="Toggle Light/Dark Mode">🌙</button>
+    </div>
+
+    <div class="app-container" style="display:none;">
+      <form id="subForm">
+        <input type="text" id="name" placeholder="Subscription Name" required />
+        <input type="number" id="price" placeholder="Price ($)" step="0.01" required />
+        <input type="date" id="nextDate" required />
+        <select id="frequency" required>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+        <button type="submit">Add Subscription</button>
       </form>
-      <p id="emailLoginError" class="error-msg"></p>
-    </div>
-  </div>
 
-  <!-- Loading Spinner -->
-  <div id="loadingSpinner" class="loading-spinner" style="display:none;"></div>
+      <h2>Your Subscriptions</h2>
+      <ul id="subList"></ul>
+      <div class="summary">
+        <p>Total Monthly: $<span id="monthlyTotal">0</span></p>
+        <p>Total Yearly: $<span id="yearlyTotal">0</span></p>
+      </div>
+    </div>
+
+    <div id="emailLoginModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span id="modalCloseBtn" class="close">&times;</span>
+        <h3>Email Login / Register</h3>
+        <form id="emailLoginForm">
+          <input type="email" id="emailInput" placeholder="Email" required />
+          <input type="password" id="passwordInput" placeholder="Password" required minlength="6" />
+          <button type="submit">Login / Register</button>
+        </form>
+        <p id="emailLoginError" class="error-msg"></p>
+      </div>
+    </div>
+
+    <div id="loadingSpinner" class="loading-spinner" style="display:none;"></div>
+  </div>
 
   <script type="module" src="script.js"></script>
 </body>
